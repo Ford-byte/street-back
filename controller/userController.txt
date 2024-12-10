@@ -1,0 +1,265 @@
+
+// const UserModel = require('../model/userModel');
+// const bcryptjs = require('bcryptjs');
+// const jwt = require('jsonwebtoken');
+// const columnRenamer = require('../middlewares/columnRenamer');
+// const { v4: uuidv4 } = require('uuid');
+// const getCurrentDateTime = require('../middlewares/getDate');
+// const { sendMail } = require('../middlewares/emailMiddleware.js');
+// const userModel = require('../model/userModel');
+
+// const id = uuidv4();
+// class UserController {
+
+//     async getUsers(req, res) {
+//         try {
+//             UserModel.get((error, result) => {
+//                 if (error) {
+//                     console.error('Error fetching users:', error);
+//                     return res.status(500).json({ message: 'Internal Server Error!' });
+//                 }
+//                 const response = columnRenamer(result);
+//                 res.status(200).json({ response });
+//             });
+//         } catch (error) {
+//             console.error('Error during getUsers:', error);
+//             res.status(500).json({ message: 'Internal Server Error!' });
+//         }
+//     }
+//     async getUserUserById(req, res) {
+//         const id = req.parms.id;
+//         try {
+//             UserModel.getUserById(id, (error, result) => {
+//                 if (error) {
+//                     console.error('Error fetching users:', error);
+//                     return res.status(500).json({ message: 'Internal Server Error!' });
+//                 }
+//                 const response = columnRenamer(result);
+//                 res.status(200).json({ response });
+//             });
+//         } catch (error) {
+//             console.error('Error during getUsers:', error);
+//             res.status(500).json({ message: 'Internal Server Error!' });
+//         }
+//     }
+//     async otp(req, res) {
+//         try {
+//             const email = req.body.email;
+
+//             // Validate email format
+//             if (!email || !/\S+@\S+\.\S+/.test(email)) {
+//                 return res.status(400).json({ message: 'Invalid email format!' });
+//             }
+
+//             // Check if the email already exists
+//             const userExists = await UserModel.getUser(email);
+
+//             // Assuming getUser returns an array or object; adjust accordingly
+//             if (userExists.length > 0 && userExists[0].email === email) {
+//                 return res.status(400).json({ message: 'Email is already registered, cannot proceed to registration!' });
+//             }
+
+//             const otp = (Math.floor(100000 + Math.random() * 900000)).toString();
+//             const timestamp = getCurrentDateTime();
+//             const expirationMinutes = 3;
+//             const expirationTimestamp = timestamp + expirationMinutes * 60 * 1000;
+
+//             await UserModel.otp([otp, email, expirationTimestamp]);
+
+//             // Send the OTP to the user
+//             // try {
+//             //     await sendMail(email, otp);
+//             // } catch (mailError) {
+//             //     console.error('Error sending OTP email:', mailError);
+//             //     return res.status(500).json({ message: 'Failed to send OTP email!' });
+//             // }
+
+//             return res.status(200).json({ message: 'OTP generated and sent successfully!' });
+
+//         } catch (err) {
+//             console.error('Error during OTP generation:', err);
+//             return res.status(500).json({ message: 'Internal server error!' });
+//         }
+//     }
+
+
+
+//     async userRegistration(req, res) {
+//         try {
+//             const { otp, email, name, password, birthdate, role } = req.body;
+
+//             // Ensure all fields are provided
+//             if (!otp || !email || !name || !password || !birthdate || !role) {
+//                 return res.status(400).json({ message: 'All fields are required!' });
+//             }
+//             if (role == 'admin') {
+//                 return res.send({ message: "Please do not change the Roles" });
+//             }
+
+//             // Check OTP validity
+//             const result = await UserModel.myOtp(otp);
+//             if (!result) {
+//                 return res.status(400).json({ message: 'Invalid OTP!' });
+//             }
+
+//             const otpData = result[0];
+//             const currentTime = getCurrentDateTime();
+//             const expirationTimestamp = otpData.expirationTimestamp;
+
+//             // Check if OTP has expired
+//             if (currentTime > expirationTimestamp) {
+//                 return res.status(400).json({ message: 'OTP has expired!' });
+//             }
+
+//             // Hash the password
+//             const hashPassword = await bcryptjs.hash(password, 10);
+//             const id = uuidv4();
+
+//             // Prepare data for insertion
+//             const data = [
+//                 id,
+//                 role,
+//                 name,
+//                 hashPassword,
+//                 email,
+//                 birthdate,
+//                 false, // Assuming this is a flag for some status
+//                 getCurrentDateTime(),
+//                 false, // Assuming this is another flag
+//                 id
+//             ];
+
+//             const userExists = await UserModel.getUser(email);
+
+//             // Assuming getUser returns an array or object; adjust accordingly
+//             if (userExists.length > 0 && userExists[0].email === email) {
+//                 return res.status(400).json({ message: 'Email is already registered, cannot proceed to registration!' });
+//             }
+
+//             // Insert user into the database
+//             await UserModel.insert(data);
+
+//             res.status(200).json({ message: 'Welcome to STREET WEAR FASHION!' });
+
+//         } catch (error) {
+//             console.error('Error during user registration:', error);
+//             res.status(500).json({ message: 'Internal Server Error!' });
+//         }
+//     }
+
+//     async userLogin(req, res) {
+//         try {
+//             const { username, password } = req.body;
+
+//             // Retrieve user by username
+//             const result = await UserModel.getUser(username);
+//             if (!result) {
+//                 return res.status(401).json({ success: false, message: 'User not found!' });
+//             }
+
+//             const user = result[0];
+
+//             // Compare passwords
+//             const passwordMatch = await bcryptjs.compare(password, user.password);
+//             if (!passwordMatch) {
+//                 return res.status(401).json({ success: false, message: 'Invalid password!' });
+//             }
+
+//             const accessToken = jwt.sign({ id: user.id }, "jwt-access-token-secret-key", { expiresIn: '10h' })
+
+//             // Send success response
+//             res.status(200).json({ success: true, message: 'Login successful!', role: user.role, id: user.id, isUser: user.email, token: accessToken });
+
+//         } catch (error) {
+//             console.error('Error during login:', error);
+//             res.status(500).json({ success: false, message: 'Error occurred while processing data' });
+//         }
+//     }
+
+//     async addRole(req, res) {
+//         const { role, id } = req.body;
+//         const data = [role, id];
+//         UserModel.addRole(data, (error, result) => {
+//             if (error) {
+//                 return res.send({ message: "Error Occured", error })
+//             }
+//             res.send({ message: "Role added" });
+//         })
+//     }
+
+//     async getUserByRole(req, res) {
+//         const role = req.params.role;
+
+//         try {
+//             const result = await UserModel.getUserRole(role); // Assuming this returns a Promise
+//             const finalResult = columnRenamer(result)
+//             res.send({ finalResult });
+//         } catch (error) {
+//             res.status(500).send({ message: "Internal Server Error", error });
+//         }
+//     }
+
+//     async addProfile(req, res) {
+//         const uid = req.body.uid;
+//         const image = req.file;
+//         const imagePath = image.filename;
+//         const data = [
+//             id,
+//             uid,
+//             imagePath
+//         ]
+//         try {
+//             const result = await UserModel.addImage(data);
+//             res.send({ result })
+//         } catch (error) {
+//             res.status(500).send({ message: "Internal Server Error", error });
+//         }
+//     }
+
+//     async updateUser(req, res) {
+//         const id = req.params.id;
+//         const {
+//             name,
+//             email,
+//             birthdate
+//         } = req.body;
+
+//         if (!name || !email || !birthdate) {
+//             return res.status(400).send({ message: "Missing required fields!" });
+//         }
+
+//         const data = [
+//             name,
+//             email,
+//             birthdate,
+//             getCurrentDateTime(),
+//             id
+//         ]
+
+//         try {
+//             const result = await UserModel.updateUser(data);
+//             res.send({ message: "User data updated!", result });
+//         } catch (error) {
+//             console.error("Error updating user:", error); // For server-side debugging
+//             res.status(500).send({ message: "Internal Server Error!", error: error.message });
+//         }
+//     }
+
+//     async deleteUser(req, res) {
+//         const id = req.params.id;
+//         try {
+//             UserModel.deleteUser(id, (error, result) => {
+//                 if (error) {
+//                     return res.send({ message: "Internal server error" })
+//                 }
+//                 res.send({ message: "User Deleted!" })
+//             })
+//         } catch (error) {
+
+//         }
+//     }
+
+// }
+
+// module.exports = new UserController();
+

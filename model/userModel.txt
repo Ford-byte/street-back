@@ -1,0 +1,117 @@
+// const { connection } = require('../services/dbConnection');
+
+// class UserModel {
+//     async get() {
+//         const query = "SELECT * FROM user WHERE isDeleted = 0"; // Changed false to 0
+//         return new Promise((resolve, reject) => {
+//             connection.query(query, (error, results) => {
+//                 if (error) reject(error);
+//                 else resolve(results);
+//             });
+//         });
+//     }
+
+//     async insert(data) {
+//         const query = "INSERT INTO user (id,role, name, password, email, birthdate, isDeleted, isCreated, isUpdated, order_id) VALUES (?, ?,?, ?, ?, ?, ?, ?, ?, ?)";
+//         return new Promise((resolve, reject) => {
+//             connection.query(query, data, (error, results) => {
+//                 if (error) reject(error);
+//                 else resolve(results);
+//             });
+//         });
+//     }
+//     async updateUser(data, callback) {
+//         const query = "UPDATE user SET name =?,email=?,birthdate=?,isUpdated=? WHERE id = ?";
+//         connection.query(query, data, callback)
+//     }
+
+//     async deleteUser(id, callback) {
+//         const query = "UPDATE user SET isDeleted = 1 WHERE id = ?";
+//         connection.query(query, [id], (error, results) => {
+//             if (error) {
+//                 console.error('Error updating user:', error);
+//                 if (callback) callback(error); // Pass error to callback if provided
+//                 return;
+//             }
+//             console.log('User marked as deleted:', results);
+//             if (callback) callback(null, results); // Pass results to callback if provided
+//         });
+//     }
+
+
+
+//     async login(email, callback) {
+//         const query = "SELECT * FROM user WHERE email = ? AND isDeleted = 0";
+//         connection.query(query, email, callback)
+//     }
+
+//     async getUser(email) {
+//         const query = "SELECT * FROM user WHERE email = ? AND isDeleted = 0";
+
+//         return new Promise((resolve, reject) => {
+//             connection.query(query, email, (error, results) => {
+//                 if (error) {
+//                     return reject(error);
+//                 }
+//                 resolve(results);
+//             });
+//         });
+//     }
+//     async getUserById(id) {
+//         const query = "SELECT * FROM user WHERE id = ? AND isDeleted = 0";
+
+//         return new Promise((resolve, reject) => {
+//             connection.query(query, id, (error, results) => {
+//                 if (error) {
+//                     return reject(error);
+//                 }
+//                 resolve(results);
+//             });
+//         });
+//     }
+//     async getUserRole(role) {
+//         const query = "SELECT * FROM user WHERE role = ? && isDeleted = 0";
+
+//         return new Promise((resolve, reject) => {
+//             connection.query(query, role, (error, results) => {
+//                 if (error) {
+//                     return reject(error);
+//                 }
+//                 resolve(results);
+//             });
+//         });
+//     }
+
+
+//     async otp(data) {
+//         const query = "INSERT INTO otp(otpnum, email, expirationTimestamp) VALUES (?, ?, ?)";
+//         return new Promise((resolve, reject) => {
+//             connection.query(query, data, (error, results) => {
+//                 if (error) reject(error);
+//                 else resolve(results);
+//             });
+//         });
+//     }
+
+//     async myOtp(otp) {
+//         const query = "SELECT * FROM otp WHERE otpnum = ?"; // Changed otpnum to otp
+//         return new Promise((resolve, reject) => {
+//             connection.query(query, [otp], (error, results) => {
+//                 if (error) reject(error);
+//                 else resolve(results);
+//             });
+//         });
+//     }
+
+//     async addRole(data, callback) {
+//         const query = "UPDATE user SET role = ? WHERE id = ?";
+//         connection.query(query, data, callback);
+//     }
+
+//     async addImage(data, callback) {
+//         const query = "INSERT INTO userprofile(id,uid,image,isDeleted) values(?,?,?,0)";
+//         connection.query(query, data, callback);
+//     }
+// }
+
+// module.exports = new UserModel();
