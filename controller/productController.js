@@ -253,11 +253,11 @@ class Controller {
     }
 
     async updateProduct(req, res) {
-        const { SW_Name, SW_Small, SW_Medium, SW_Large, SW_X_large, SW_Category, SW_Price } = req.body;
+        const { SW_Name, SW_Small, SW_Medium, SW_Large, SW_X_large, SW_Category, SW_Price,SW_Discount } = req.body;
         const id = req.params.id;
 
         const data = [
-            SW_Name, SW_Small, SW_Medium, SW_Large, SW_X_large, SW_Price, SW_Category, id
+            SW_Name, SW_Small, SW_Medium, SW_Large, SW_X_large, SW_Price, SW_Category,SW_Discount, id
         ];
 
         try {

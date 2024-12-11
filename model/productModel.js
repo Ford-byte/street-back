@@ -4,7 +4,7 @@ class Model {
     async get(callback) {
         // const query = "SELECT * FROM product WHERE isDeleted = 0";
         // const query = "SELECT p.id,p.size_id,p.name,p.images,p.isApproved,ps.size,ps.price,ps.category,ps.stockIn FROM product AS p LEFT JOIN productsizes AS ps ON p.size_id = ps.id WHERE p.isDeleted = 0";
-        const query = "SELECT p.id,p.size_id,p.name,p.images,p.isApproved,p.isCreated,ps.small,ps.medium,ps.large,ps.x_large,ps.price,ps.category FROM product AS p LEFT JOIN productsizes AS ps ON p.size_id = ps.id WHERE p.isDeleted = 0 AND p.isCreated >= DATE_SUB(NOW(), INTERVAL 1 WEEK);";
+        const query = "SELECT p.id,p.size_id,p.name,p.images,p.discount,p.isApproved,p.isCreated,ps.small,ps.medium,ps.large,ps.x_large,ps.price,ps.category FROM product AS p LEFT JOIN productsizes AS ps ON p.size_id = ps.id WHERE p.isDeleted = 0 AND p.isCreated >= DATE_SUB(NOW(), INTERVAL 1 WEEK);";
         connection.query(query, callback);
     }
 
@@ -14,7 +14,8 @@ class Model {
                 p.id, 
                 p.size_id, 
                 p.name, 
-                p.images, 
+                p.images,
+                p.discount,
                 p.isApproved, 
                 p.isCreated, 
                 ps.small, 
@@ -155,7 +156,7 @@ class Model {
     }
 
     async update(data, callback) {
-        const query = `UPDATE product AS p LEFT JOIN productsizes AS ps ON p.size_id = ps.id SET p.name = ?,ps.small = ?,ps.medium = ?,ps.large = ?,ps.x_large = ?,ps.price = ?,ps.category=? WHERE p.id = ?`;
+        const query = `UPDATE product AS p LEFT JOIN productsizes AS ps ON p.size_id = ps.id SET p.name = ?,ps.small = ?,ps.medium = ?,ps.large = ?,ps.x_large = ?,ps.price = ?,ps.category=?,p.discount=? WHERE p.id = ?`;
         connection.query(query, data, callback);
     }
 
